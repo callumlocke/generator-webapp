@@ -1,12 +1,11 @@
 {
   "name": "generator-ig-job",
-  "private": "true",
+  "private": true,
   "version": "0.1.0",
   "description": "Default IG generator for scaffolding out an interactive",
   "homepage": "https://github.com/ft-interactive/generator-ig-job",
   "bugs": "https://github.com/ft-interactive/generator-ig-job/issues",
   "author": "FT Interactive",
-  "main": "app/index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/ft-interactive/generator-ig-job.git"
