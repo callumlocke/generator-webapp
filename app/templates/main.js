@@ -1,8 +1,10 @@
-/*global app:true */
+'use strict';
+
+<% if (features.d3) { %>
+var d3 = require('../bower_components/d3/d3');
+<% } %>
 
 (function (window, $) {
-
-  'use strict';
 
   var view = app.views.main;
 
@@ -31,9 +33,9 @@
     * Sets the size of the iframe along the sides
     * that have not been set on the parent document - i.e it will never override
     * the iframe's explicitly defined dimensions (unless it's 0px).
-    
+
     * For more, see code docs:
-    * /bower_compnents/ig-utils/js/iframe-utils.js
+    * /bower_components/ig-utils/js/iframe-utils.js
     */
     // IG.iframeUtils.resizeZeroParentFrameValuesToContent();
 <% } %>

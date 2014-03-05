@@ -32,7 +32,6 @@ var AppGenerator = module.exports = function Appgenerator(args, options, config)
       '  * lodash   : A utility library for consistency, customization, performance, and extra features.',
       '  * backbone  : Give your JS App some Backbone with Models, Views, Collections, and Events (requires lodash)',
       '  * isotope   : An exquisite jQuery plugin for magical layouts. Enables filtering, sorting, and dynamic layouts.',
-      '  * d3        : A JavaScript visualization library for HTML and SVG',
       '\n',
       '...to find more libs run:\n',
       '      $ bower search\n\n'

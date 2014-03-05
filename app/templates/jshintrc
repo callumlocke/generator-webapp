@@ -3,7 +3,10 @@
     "browser": true,
     "globals": {
         "$": true,
-        "IG": true
+        "IG": true,
+        "app": true,
+        "module": false,
+        "require": false
     },
     "esnext": true,
     "bitwise": true,
