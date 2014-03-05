@@ -2,7 +2,6 @@
   "name": "<%= _.slugify(appname) %>",
   "version": "0.0.0",
   "dependencies": {
-    "jquery": "~1.9.1",
     "ig-fill": "https://gist.github.com/baa2d589782ec1eb4afc.git",<% if (includeFurniture) { %>
     "ig-furniture": "https://gist.github.com/375ebcf89f9aa70c0a1e.git",<% } %>
     "ig-utils": "https://github.com/ft-interactive/ig-utils.git",

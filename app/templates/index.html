@@ -23,6 +23,13 @@
         <div id="main-content"></div><% if (includeFurniture) { %>
         <footer class="furniture hidden"></footer><% } %>
         <!--#include virtual="/inc/extras-foot-1.html" --><% if (includeBerthaSpreadsheet) { %>
-        <script src="http://bertha.ig.ft.com/view/publish/js/<%= spreadsheetId %>/basic?d=app.data"></script><% } %>
+        <script src="http://bertha.ig.ft.com/view/publish/js/<%= spreadsheetId %>/basic?d=app.data"></script><% } %><% if (features.jquery) { %>
+        <!--[if lt IE 9]>
+            <script src="//www.ft.com/ig/js/jquery-1.11.0.min.js"></script>
+        <![endif]-->
+        <!--[if gte IE 9]><!-->
+            <script src="//www.ft.com/ig/js/jquery-2.1.0.min.js"></script>
+        <!--<![endif]-->
+        <% } %>
     </body>
 </html>
