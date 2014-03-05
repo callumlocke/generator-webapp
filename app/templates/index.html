@@ -10,6 +10,9 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
         <!--#include virtual="/inc/extras-head-1.html" -->
+        <!-- build:js({.tmp,app}) scripts/top.js -->
+        <script src="scripts/vendor/modernizr.js"></script>
+        <!-- endbuild -->
         <!-- build:css({.tmp,app}) styles/main.css --><% if (includeFurniture) { %>
         <link rel="stylesheet" href="bower_components/ig-furniture/furniture.css"><% } %>
         <link rel="stylesheet" href="styles/main.css">

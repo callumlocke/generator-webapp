@@ -25,8 +25,7 @@
     "grunt-open": "~0.2.0",
     "grunt-svgmin": "~0.2.0",
     "grunt-concurrent": "~0.4.0",
-    "grunt-contrib-handlebars": "~0.5.10",<% if (includeModernizr) { %>
-    "grunt-modernizr": "~0.3.0",<% } %>
+    "grunt-contrib-handlebars": "~0.5.10",
     "grunt-embed": "~0.0.6",
     "grunt-igdeploy": "git+https://github.com/ft-interactive/grunt-igdeploy.git",
     "grunt-report": "~0.0.4",

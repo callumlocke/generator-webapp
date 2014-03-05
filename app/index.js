@@ -5,6 +5,7 @@ var spawn = require('child_process').spawn;
 var yeoman = require('yeoman-generator');
 var parseSpreadsheetKey = require('parse-spreadsheet-key');
 var moment = require('moment');
+var async = require('async');
 
 var AppGenerator = module.exports = function Appgenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
@@ -52,96 +53,131 @@ var AppGenerator = module.exports = function Appgenerator(args, options, config)
 util.inherits(AppGenerator, yeoman.generators.Base);
 
 AppGenerator.prototype.askFor = function askFor() {
-  var cb = this.async();
+  var generator = this;
+  var promptsDone = generator.async();
+
   console.log(this.banner);
 
-  var promptFeatures = [{
-    type: 'checkbox',
-    name: 'features',
-    message: 'Which features would you like? (Press UP/DOWN and SPACE to select/deselect an option, then press ENTER to continue.)',
-    choices: [{
-      name: 'Bertha spreadsheet',
-      value: 'bertha',
-      checked: true
+  generator.includeIFrame = false;
+  generator.includeBerthaSpreadsheet = false;
+  generator.includeHandlebars = false;
+  generator.includePublisher = false;
+  generator.includeFurniture = false;
+
+  async.waterfall([
+
+    function jobTypePrompt(done) {
+      generator.prompt([{
+        type: 'list',
+        name: 'jobType',
+        message: 'What type of interactive do you want to make?',
+        choices: [{
+          name: 'Embedded graphic',
+          value: 'embedded',
+          default: true
+        }, {
+          name: 'Microsite',
+          value: 'microsite',
+          default: false
+        }]
+      }], function (answers) {
+        generator.microsite = (answers.jobType === 'microsite');
+        done();
+      });
     },
-    {
-      name: 'Will the job be served in an iframe?',
-      value: 'iframe',
-      checked: true
-    },
-    {
-      name: 'Will the furniture be needed?',
-      value: 'furniture',
-      checked: true
-    },
-    {
-      name: 'Modernizr',
-      value: 'modernizr',
-      checked: true
-    },
-    {
-      name: 'Handlebars templates',
-      value: 'handlebars',
-      checked: true
-    }]
-  }];
 
-  var promptSpreadsheetId = {
-    type: 'input',
-    name: 'spreadsheetId',
-    message: 'If you have a Google Spreadsheet URL or ID paste it here. If you don\'t then skip this step:'
-  };
-
-  // Hard coded options
-  this.includeModernizr = false;
-  this.spreadsheetId = null;
-  this.includeBerthaSpreadsheet = false;
-  this.includeFurniture = false;
-  this.includeHandlebars = false;
-  this.includeIFrame = true;
-  this.includePublisher = false;
-  var gen = this;
-  gen.prompt(promptFeatures, function (answers) {
-    var features = answers.features;
-
-    gen.includeIFrame = features.indexOf('iframe') !== -1;
-    gen.includeModernizr = features.indexOf('modernizr') !== -1;
-    gen.includeBerthaSpreadsheet = features.indexOf('bertha') !== -1;
-    gen.includeHandlebars = features.indexOf('handlebars') !== -1;
-    gen.includePublisher = gen.includeBerthaSpreadsheet && gen.includeIFrame;
-    gen.includeFurniture = features.indexOf('furniture') !== -1;
-
-    var suggestedDeployBase = 'features/' + moment().format('YYYY-MM-DD') + '_' + path.basename(process.cwd());
-    var deployBasePrompt = {
-        'message': 'Where should this project be deployed to?',
-        'name': 'deployBase',
-        'default': suggestedDeployBase
-    };
-    gen.prompt([deployBasePrompt], function (answer) {
-        gen.deployBase = answer.deployBase;
-
-        if (gen.includeBerthaSpreadsheet) {
-          (function doSpreadsheetIdPrompt() {
-            gen.prompt([promptSpreadsheetId], function (answer) {
-              var key;
-              if (answer.spreadsheetId) {
-                try {
-                  key = parseSpreadsheetKey(answer.spreadsheetId);
-                } catch (e) {
-                  gen.log('\u001b[31m' + 'Error: ' + e.message + '\u001b[0m');
-                  doSpreadsheetIdPrompt();
-                  return;
-                }
-              }
-              gen.spreadsheetId = key;
-              cb();
-            });
-          })();
-        } else {
-          cb();
+    function featuresPrompt(done) {
+      var choices = [
+        {
+          name: 'jQuery',
+          value: 'jquery',
+          default: false
+        }, {
+          name: 'D3.js',
+          value: 'd3',
+          default: false
+        }, {
+          name: 'Bertha',
+          value: 'bertha',
+          default: false
+        }, {
+          name: 'Hogan.js templates',
+          value: 'hogan',
+          default: false
         }
-    });
-  });
+      ];
+
+      generator.prompt([{
+        type: 'checkbox',
+        name: 'features',
+        message: 'Which features do you need?',
+        choices: choices
+      }], function (answers) {
+
+        generator.features = {};
+
+        choices.forEach(function (choice) {
+          generator.features[choice.value] = (
+            answers.features.indexOf(choice.value) !== -1
+          );
+        });
+
+        done();
+      });
+    },
+
+    function spreadsheetIdPrompt(done) {
+      if (generator.features.bertha) {
+        generator.prompt([{
+          type: 'input',
+          name: 'spreadsheetId',
+          message: 'If you have a Google Spreadsheet URL or ID (for Bertha), paste it here.'
+        }], function (answers) {
+          var key = 'ENTER_A_SPREADSHEET_ID_HERE';
+          if (answers.spreadsheetId) {
+            try {
+              key = parseSpreadsheetKey(answers.spreadsheetId);
+            } catch (e) {
+              generator.log('\u001b[31m' + 'Error: ' + e.message + '\u001b[0m');
+              spreadsheetIdPrompt(done);
+              return;
+            }
+          }
+
+          generator.spreadsheetId = key;
+          done();
+        });
+      }
+      else done();
+    },
+
+    function deployBasePrompt(done) {
+      var suggested;
+      if (generator.jobType === 'embedded') {
+        suggested = (
+          'features/' + moment().format('YYYY-MM-DD') + '_' +
+          path.basename(process.cwd())
+        );
+      }
+      else {
+        suggested = (
+          'sites/' + moment().format('YYYY') + '/' +
+          path.basename(process.cwd())
+        );
+      }
+
+      generator.prompt([{
+        type: 'input',
+        name: 'deployBase',
+        message: 'Where do you want to deploy this project?',
+        default: suggested
+      }], function (answers) {
+        generator.deployBase = answers.deployBase;
+        done();
+      });
+    }
+
+  ], promptsDone);
 };
 
 AppGenerator.prototype.gruntfile = function gruntfile() {
@@ -176,7 +212,7 @@ AppGenerator.prototype.h5bp = function h5bp() {
 
 AppGenerator.prototype.mainStylesheet = function mainStylesheet() {
   this.copy('_var.scss', 'app/styles/_var.scss');
-  this.copy('plain.scss', 'app/styles/main.scss');
+  this.copy('main.scss', 'app/styles/main.scss');
 };
 
 AppGenerator.prototype.writeIndex = function writeIndex() {
@@ -222,11 +258,6 @@ AppGenerator.prototype.writeIndex = function writeIndex() {
 
   var indent = '        ';
 
-  if (this.includeModernizr) {
-    var modernizrBlock = this.generateBlock('js', 'scripts/vendor/top.js', indent + '<script src="scripts/vendor/modernizr.js"></script>\n', ['.tmp', 'app']);
-    this.indexFile = this.append(this.indexFile, 'head', '\n' + modernizrBlock + '\n');
-  }
-
   this.mainJsFile = this.readFileAsString(path.join(this.sourceRoot(), 'main.js'));
 
   // insert Apache SSI tag as the last item in the head element
@@ -248,10 +279,6 @@ AppGenerator.prototype.writeIndex = function writeIndex() {
 };
 
 AppGenerator.prototype.app = function app() {
-  if (this.includeModernizr) {
-    this.copy('modernizr.json', 'modernizr.json');
-  }
-
   this.mkdir('app');
 
   if (this.includeHandlebars) {
@@ -260,6 +287,7 @@ AppGenerator.prototype.app = function app() {
   }
 
   this.mkdir('app/scripts');
+  this.mkdir('app/scripts/vendor');
   this.mkdir('app/styles');
   this.mkdir('app/styles/fonts');
   this.mkdir('app/images');
@@ -277,4 +305,5 @@ AppGenerator.prototype.app = function app() {
 
   this.template('boilerplate.js', 'app/scripts/boilerplate.js');
   this.template('main.js', 'app/scripts/main.js');
+  this.template('modernizr.js', 'app/scripts/vendor/modernizr.js');
 };

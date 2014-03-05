@@ -9,10 +9,6 @@
 // use this if you want to recursively match all subfolders:
 // 'test/spec/**/*.js'
 
-<% if (includeModernizr) { %>
-var modernizrConf = require('./modernizr.json');
-<% } %>
-
 module.exports = function (grunt) {
 
     // Load grunt tasks automatically
@@ -384,15 +380,7 @@ module.exports = function (grunt) {
             live: {
                 path: '<%%= igdeploy.options.baseURL %><%%= igdeploy.options.targets.live %>/'
             }
-        },<% if (includeModernizr) { %>
-        modernizr: {
-            parseFiles: false,
-            outputFile: '.tmp/scripts/vendor/modernizr.js',
-            uglify: false,
-            extra: modernizrConf.extra,
-            extensibility : modernizrConf.extensibility,
-            tests: modernizrConf.tests,
-        },<% } %>
+        },
         embed: {
             options: {
                 threshold: '7KB'
@@ -437,8 +425,7 @@ module.exports = function (grunt) {
         },
         concurrent: {
             server: [<% if (includeHandlebars) { %>
-                'templates',<% } %><% if (includeModernizr) { %>
-                //'modernizr',<% } %>
+                'templates',<% } %>
                 'compass:server',
                 'copy:styles'
             ],
@@ -447,8 +434,7 @@ module.exports = function (grunt) {
                 'copy:styles'
             ],
             dist: [<% if (includeHandlebars) { %>
-                'templates',<% } %><% if (includeModernizr) { %>
-                //'modernizr',<% } %>
+                'templates',<% } %>
                 'compass',
                 'copy:styles',
                 'imagemin',
