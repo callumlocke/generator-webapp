@@ -29,7 +29,7 @@ module.exports = function (grunt) {
         watch: {
             js: {
                 files: ['<%%= yeoman.app %>/scripts/{,*/}*.js'],
-                tasks: ['jshint'],
+                tasks: ['jshint', 'browserify:main'],
                 options: {
                     livereload: true
                 }
@@ -205,6 +205,16 @@ module.exports = function (grunt) {
         },
 
 <% } %>
+        browserify: {
+            main: {
+                src: ['<%= yeoman.app %>/scripts/main.js'],
+                dest: '.tmp/scripts/main-bundle.js',
+                options: {
+                    debug: true
+                }
+            }
+        },
+
         uglify: {
             options: {
                 preserveComments: 'some'
@@ -426,6 +436,7 @@ module.exports = function (grunt) {
         concurrent: {
             server: [<% if (includeHandlebars) { %>
                 'templates',<% } %>
+                'browserify:main',
                 'compass:server',
                 'copy:styles'
             ],
@@ -435,6 +446,7 @@ module.exports = function (grunt) {
             ],
             dist: [<% if (includeHandlebars) { %>
                 'templates',<% } %>
+                'browserify:main',
                 'compass',
                 'copy:styles',
                 'imagemin',

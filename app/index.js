@@ -242,7 +242,7 @@ AppGenerator.prototype.writeIndex = function writeIndex() {
   }
 
   projectScripts.push('scripts/boilerplate.js');
-  projectScripts.push('scripts/main.js');
+  projectScripts.push('scripts/main-bundle.js');
 
   var scriptList;
 
@@ -252,7 +252,7 @@ AppGenerator.prototype.writeIndex = function writeIndex() {
     scriptList = bowerComponentScripts.concat(projectScripts);
   }
 
-  this.indexFile = this.appendFiles(this.indexFile, 'js', 'scripts/main.js', scriptList, null, ['.tmp', 'app']);
+  this.indexFile = this.appendFiles(this.indexFile, 'js', 'scripts/bottom.js', scriptList, null, ['.tmp', 'app']);
 
   var indent = '        ';
 
