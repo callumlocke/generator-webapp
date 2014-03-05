@@ -24,25 +24,23 @@ var AppGenerator = module.exports = function Appgenerator(args, options, config)
   this.mainJsFile = '';
 
   this.on('end', function () {
-    this.installDependencies({ skipInstall: options['skip-install'], callback: function(){
-      var msg = [
-        '\n\n\n  ---- ALL DONE! ----\n',
-        'You might need to install some of the libraries listed below.\n',
-        'For example, to download and install "lodash" and "backbone" run the following command:\n\n',
-        '      $ bower install -S lodash backbone\n\n',
-        '  * lodash   : A utility library for consistency, customization, performance, and extra features.',
-        '  * backbone  : Give your JS App some Backbone with Models, Views, Collections, and Events (requires lodash)',
-        '  * isotope   : An exquisite jQuery plugin for magical layouts. Enables filtering, sorting, and dynamic layouts.',
-        '  * d3        : A JavaScript visualization library for HTML and SVG',
-        '\n',
-        '...to find more libs run:\n',
-        '      $ bower search\n\n'
-      ];
-      if (this.spreadsheetId) {
-        msg.push('Bertha republish URL: http://bertha.ig.ft.com/republish/publish/js/' + this.spreadsheetId + '/basic?d=app.data\n\n');
-      }
-      console.log(msg.join('\n   '));
-    }.bind(this)});
+    var msg = [
+      '\n\n\n  ---- ALL DONE! ----\n',
+      'You might need to install some of the libraries listed below.\n',
+      'For example, to download and install "lodash" and "backbone" run the following command:\n\n',
+      '      $ bower install -S lodash backbone\n\n',
+      '  * lodash   : A utility library for consistency, customization, performance, and extra features.',
+      '  * backbone  : Give your JS App some Backbone with Models, Views, Collections, and Events (requires lodash)',
+      '  * isotope   : An exquisite jQuery plugin for magical layouts. Enables filtering, sorting, and dynamic layouts.',
+      '  * d3        : A JavaScript visualization library for HTML and SVG',
+      '\n',
+      '...to find more libs run:\n',
+      '      $ bower search\n\n'
+    ];
+    if (this.spreadsheetId) {
+      msg.push('Bertha republish URL: http://bertha.ig.ft.com/republish/publish/js/' + this.spreadsheetId + '/basic?d=app.data\n\n');
+    }
+    console.log(msg.join('\n   '));
   });
 
   this.banner = this.readFileAsString(path.join(__dirname, 'BANNER'));
@@ -306,4 +304,17 @@ AppGenerator.prototype.app = function app() {
   this.template('boilerplate.js', 'app/scripts/boilerplate.js');
   this.template('main.js', 'app/scripts/main.js');
   this.template('modernizr.js', 'app/scripts/vendor/modernizr.js');
+};
+
+AppGenerator.prototype.install = function () {
+  if (this.options['skip-install']) {
+    return;
+  }
+
+  var done = this.async();
+  this.installDependencies({
+    skipMessage: this.options['skip-install-message'],
+    skipInstall: this.options['skip-install'],
+    callback: done
+  });
 };
