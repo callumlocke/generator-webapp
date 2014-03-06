@@ -6,6 +6,7 @@ var yeoman = require('yeoman-generator');
 var parseSpreadsheetKey = require('parse-spreadsheet-key');
 var moment = require('moment');
 var async = require('async');
+var chalk = require('chalk');
 
 var AppGenerator = module.exports = function Appgenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
@@ -59,7 +60,6 @@ AppGenerator.prototype.askFor = function askFor() {
   generator.includeBerthaSpreadsheet = false;
   generator.includeHandlebars = false;
   generator.includePublisher = false;
-  generator.includeFurniture = false;
 
   async.waterfall([
 
@@ -83,23 +83,40 @@ AppGenerator.prototype.askFor = function askFor() {
       });
     },
 
-    function featuresPrompt(done) {
-      var choices = [
-        {
+    function flavourPrompt(done) {
+      generator.prompt([{
+        type: 'list',
+        name: 'flavour',
+        message: 'What do you want to use for DOM manipulation?',
+        choices: [{
           name: 'jQuery',
           value: 'jquery',
-          default: false
+          default: true
         }, {
-          name: 'D3.js',
-          value: 'd3',
-          default: false
+          name: 'D3.js' + chalk.gray(' (IE9+)'),
+          value: 'd3'
         }, {
+          name: 'Plain JavaScript (no library)',
+          value: 'vanilla'
+        }]
+      }], function (answers) {
+        generator.flavour = answers.flavour;
+        done();
+      });
+    },
+
+    function featuresPrompt(done) {
+      var choices = [{
           name: 'Bertha',
           value: 'bertha',
           default: false
         }, {
           name: 'Hogan.js templates',
           value: 'hogan',
+          default: false
+        }, {
+          name: 'FT IG furniture',
+          value: 'furniture',
           default: false
         }
       ];
@@ -108,7 +125,10 @@ AppGenerator.prototype.askFor = function askFor() {
         type: 'checkbox',
         name: 'features',
         message: 'Which features do you need?',
-        choices: choices
+        choices: choices.filter(function (choice) {
+          // don't ask them about furniture if it's a microsite
+          return !(generator.microsite && choice.value === 'furniture');
+        })
       }], function (answers) {
 
         generator.features = {};
@@ -128,7 +148,7 @@ AppGenerator.prototype.askFor = function askFor() {
         generator.prompt([{
           type: 'input',
           name: 'spreadsheetId',
-          message: 'If you have a Google Spreadsheet URL or ID (for Bertha), paste it here.'
+          message: 'Bertha: Paste your Google Spreadsheet URL or ID here (if you have one)'
         }], function (answers) {
           var key = 'ENTER_A_SPREADSHEET_ID_HERE';
           if (answers.spreadsheetId) {
@@ -150,15 +170,15 @@ AppGenerator.prototype.askFor = function askFor() {
 
     function deployBasePrompt(done) {
       var suggested;
-      if (generator.jobType === 'embedded') {
+      if (generator.microsite) {
         suggested = (
-          'features/' + moment().format('YYYY-MM-DD') + '_' +
+          'sites/' + moment().format('YYYY') + '/' +
           path.basename(process.cwd())
         );
       }
       else {
         suggested = (
-          'sites/' + moment().format('YYYY') + '/' +
+          'features/' + moment().format('YYYY-MM-DD') + '_' +
           path.basename(process.cwd())
         );
       }
@@ -231,11 +251,11 @@ AppGenerator.prototype.writeIndex = function writeIndex() {
 
   var projectScripts = [];
 
-  if (this.includeFurniture) {
+  if (this.features.furniture) {
     bowerComponentScripts.push('bower_components/ig-furniture/furniture.js');
   }
 
-  if (this.includeIFrame) {
+  if (!this.microsite) {
     bowerComponentScripts.push('bower_components/ig-utils/js/iframe-utils.js');
   }
 

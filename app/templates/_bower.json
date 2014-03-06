@@ -2,11 +2,10 @@
   "name": "<%= _.slugify(appname) %>",
   "version": "0.0.0",
   "dependencies": {
-    "ig-fill": "https://gist.github.com/baa2d589782ec1eb4afc.git",<% if (includeFurniture) { %>
+    "ig-fill": "https://gist.github.com/baa2d589782ec1eb4afc.git",<% if (features.furniture) { %>
     "ig-furniture": "https://gist.github.com/375ebcf89f9aa70c0a1e.git",<% } %>
     "ig-utils": "https://github.com/ft-interactive/ig-utils.git",
-    "minimal": "https://github.com/ft-interactive/minimal.git#1.0.0"<% if (features.d3) { %>,
-    "d3": "~3.4.3"<% } %>
+    "minimal": "https://github.com/ft-interactive/minimal.git#1.0.0"
   },
   "devDependencies": {}
 }

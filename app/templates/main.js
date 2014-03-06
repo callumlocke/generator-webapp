@@ -1,8 +1,5 @@
+/*global app*/
 'use strict';
-
-<% if (features.d3) { %>
-var d3 = require('../bower_components/d3/d3');
-<% } %>
 
 (function (window, $) {
 
@@ -21,7 +18,7 @@ var d3 = require('../bower_components/d3/d3');
 <% } %>
     this.$el.html(html);
 
-<% if (includeIFrame) { %>
+<% if (!microsite) { %>
     /**
     * IFRAME RESIZING OPTION 1
     * Set the size of the iframe to equal the content of this page.

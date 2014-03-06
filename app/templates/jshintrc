@@ -1,10 +1,9 @@
 {
     "node": true,
     "browser": true,
-    "globals": {
-        "$": true,
-        "IG": true,
-        "app": true,
+    "globals": {<% if (flavour === 'd3') { %>
+        "d3": true,<% } %>
+        "IG": false,
         "module": false,
         "require": false
     },
@@ -24,6 +23,6 @@
     "unused": true,
     "strict": true,
     "trailing": true,
-    "smarttabs": true,
-    "jquery": true
+    "smarttabs": true<% if (flavour === 'jquery') { %>,
+    "jquery": true<% } %>
 }
